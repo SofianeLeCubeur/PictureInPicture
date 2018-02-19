@@ -1,9 +1,13 @@
 package fr.sofianelecubeur.pictureinpicture;
 
+import fr.sofianelecubeur.pictureinpicture.res.WaveEffect;
+import fr.sofianelecubeur.pictureinpicture.sources.ImageSource;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -15,16 +19,31 @@ import java.io.InputStream;
 public class Main {
 
     public static void main(String[] args){
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         PictureSource source = new PictureSource() {
             @Override
-            public void draw(Graphics g) {
-                g.setColor(Color.BLUE);
-                g.fillRect(0, 0, getPrefferedSize().width, getPrefferedSize().height);
+            public void draw(Graphics g, Dimension currentSize) {
+                g.setColor(Color.BLACK);
+                g.fillRect(0, 0, currentSize.width, currentSize.height);
             }
 
             @Override
             public Dimension getPrefferedSize() {
                 return new Dimension(480, 320);
+            }
+
+            @Override
+            public int getUpdateRate() {
+                return 50;
+            }
+
+            @Override
+            public Dimension getMaxmimumSize() {
+                return null;
             }
         };
         PictureInPicture pip = new PictureInPicture(source);
@@ -32,16 +51,26 @@ public class Main {
         try {
             InputStream in = Main.class.getResourceAsStream("res/upload.png");
             BufferedImage i = ImageIO.read(in);
-            pip.getToolbar().add(new ToolButton("upload", new ImageIcon(IconFactory.replace(i, Color.decode("#616161"))),
-                    new ImageIcon(IconFactory.replace(i, Color.decode("#212121"))), e -> {
-                System.out.println("fr.sofianelecubeur.pictureinpicture.Main.main()");
+            pip.getToolbar().add(new ToolButton("upload", new ImageIcon(IconFactory.replace(i, Color.decode("#F5F7FA"))),
+                    new ImageIcon(IconFactory.replace(i, Color.decode("#9E9E9E"))), e -> {
                 JFileChooser chooser = new JFileChooser();
-                chooser.setVisible(true);
+                int a = chooser.showOpenDialog(null);
+                if (a == JFileChooser.APPROVE_OPTION) {
+                    File file = chooser.getSelectedFile();
+                    try {
+                        BufferedImage img = ImageIO.read(file);
+                        if(img != null) {
+                            pip.setSource(new ImageSource(new Dimension(480, 320), img));
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }));
             in = Main.class.getResourceAsStream("res/exit.png");
             i = ImageIO.read(in);
-            pip.getToolbar().add(new ToolButton("exit", new ImageIcon(IconFactory.replace(i, Color.decode("#616161"))),
-                    new ImageIcon(IconFactory.replace(i, Color.decode("#212121"))), e -> {
+            pip.getToolbar().add(new ToolButton("exit", new ImageIcon(IconFactory.replace(i, Color.decode("#F5F7FA"))),
+                    new ImageIcon(IconFactory.replace(i, Color.decode("#9E9E9E"))), e -> {
                 pip.hide();
                 System.exit(0);
             }));

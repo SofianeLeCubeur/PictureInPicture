@@ -2,7 +2,7 @@
   <artifact type="jar" name="PictureInPicture:jar">
     <output-path>$PROJECT_DIR$/</output-path>
     <root id="archive" name="PictureInPicture.jar">
-      <element id="module-output" name="JPictureInPicture" />
+      <element id="module-output" name="PictureInPicture" />
     </root>
   </artifact>
 </component>

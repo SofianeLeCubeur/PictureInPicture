@@ -14,14 +14,18 @@ public class PictureInPicture {
     private static final Dimension MIN_SIZE = new Dimension(192, 128);
 
     private JWindow frm;
+    private ComponentResizer cr;
     private PictureToolbar toolbar;
     private PictureSource source;
 
     private Point pressed;
+    private JPanel sc;
+    private Timer updater;
     private Rectangle dragRectangle;
 
     public PictureInPicture(PictureSource source) {
         this.source = source;
+        this.cr = new ComponentResizer();
         this.toolbar = new PictureToolbar();
     }
 
@@ -42,19 +46,32 @@ public class PictureInPicture {
         toolbar.setForeground(Color.RED);
         toolbar.setBounds(frm.getWidth() / 2 - toolbar.getWidth() / 2, frm.getHeight() / 2 - toolbar.getHeight() / 2, toolbar.getWidth(), toolbar.getHeight());
         contentPane.add(toolbar, JLayeredPane.POPUP_LAYER);
+
+        sc = new JPanel(){
+            @Override
+            protected void paintComponent(Graphics g) {
+                source.draw(g, frm.getSize());
+            }
+        };
+        sc.setBounds(0, 0, frm.getWidth(), frm.getHeight());
+        contentPane.add(sc);
+
+        frm.setContentPane(contentPane);
+
         frm.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
+                sc.setBounds(0, 0, frm.getWidth(), frm.getHeight());
                 toolbar.setBounds(frm.getWidth() / 2 - toolbar.getWidth() / 2, frm.getHeight() / 2 - toolbar.getHeight() / 2, toolbar.getWidth(), toolbar.getHeight());
             }
         });
 
-        frm.setContentPane(contentPane);
-
-        ComponentResizer cr = new ComponentResizer();
         cr.registerComponent(frm);
         cr.setSnapSize(new Dimension(10, 10));
         cr.setMinimumSize(MIN_SIZE);
+        if(source.getMaxmimumSize() != null){
+            cr.setMaximumSize(source.getMaxmimumSize());
+        }
         frm.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -88,6 +105,10 @@ public class PictureInPicture {
         });
 
         frm.setVisible(true);
+        if(source.getUpdateRate() > 0){
+            updater = new Timer(source.getUpdateRate(), e -> sc.repaint());
+            updater.start();
+        }
     }
 
     public void hide(){
@@ -106,5 +127,28 @@ public class PictureInPicture {
 
     public Rectangle getDragRectangle() {
         return dragRectangle;
+    }
+
+    public void setSource(PictureSource source) {
+        this.source = source;
+        if(updater != null){
+            updater.stop();
+        }
+        if(source.getUpdateRate() > 0){
+            updater = new Timer(source.getUpdateRate(), e -> sc.repaint());
+            updater.start();
+        }
+        if(frm != null){
+            frm.setSize(source.getPrefferedSize());
+            frm.revalidate();
+            frm.repaint();
+        }
+        if(source.getMaxmimumSize() != null){
+            cr.setMaximumSize(source.getMaxmimumSize());
+        }
+    }
+
+    public PictureSource getSource() {
+        return source;
     }
 }

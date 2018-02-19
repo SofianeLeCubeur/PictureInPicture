@@ -9,6 +9,8 @@ import java.awt.*;
  */
 public interface PictureSource {
 
-    void draw(Graphics g);
+    void draw(Graphics g, Dimension currentSize);
+    int getUpdateRate();
     Dimension getPrefferedSize();
+    Dimension getMaxmimumSize();
 }
