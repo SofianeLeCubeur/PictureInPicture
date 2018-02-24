@@ -1,6 +1,5 @@
 package fr.sofianelecubeur.pictureinpicture;
 
-import fr.sofianelecubeur.pictureinpicture.res.WaveEffect;
 import fr.sofianelecubeur.pictureinpicture.sources.ImageSource;
 
 import javax.imageio.ImageIO;
@@ -49,10 +48,10 @@ public class Main {
         PictureInPicture pip = new PictureInPicture(source);
 
         try {
-            InputStream in = Main.class.getResourceAsStream("res/upload.png");
-            BufferedImage i = ImageIO.read(in);
-            pip.getToolbar().add(new ToolButton("upload", new ImageIcon(IconFactory.replace(i, Color.decode("#F5F7FA"))),
-                    new ImageIcon(IconFactory.replace(i, Color.decode("#9E9E9E"))), e -> {
+            //InputStream in = Main.class.getResourceAsStream("res/upload.png");
+           // BufferedImage i = ImageIO.read(in);
+            /*pip.getToolbar().add(new ToolButton("upload", new ImageIcon(ImageHelper.replace(i, Color.decode("#F5F7FA"))),
+                    new ImageIcon(ImageHelper.replace(i, Color.decode("#9E9E9E"))), e -> {
                 JFileChooser chooser = new JFileChooser();
                 int a = chooser.showOpenDialog(null);
                 if (a == JFileChooser.APPROVE_OPTION) {
@@ -66,11 +65,11 @@ public class Main {
                         e1.printStackTrace();
                     }
                 }
-            }));
-            in = Main.class.getResourceAsStream("res/exit.png");
-            i = ImageIO.read(in);
-            pip.getToolbar().add(new ToolButton("exit", new ImageIcon(IconFactory.replace(i, Color.decode("#F5F7FA"))),
-                    new ImageIcon(IconFactory.replace(i, Color.decode("#9E9E9E"))), e -> {
+            }));*/
+            InputStream in = Main.class.getResourceAsStream("res/close.png");
+            BufferedImage i = ImageIO.read(in);
+            pip.getControlToolbar().add(new ToolButton("exit", new ImageIcon(ImageHelper.replace(i, Color.decode("#F5F7FA"))),
+                    new ImageIcon(ImageHelper.replace(i, Color.decode("#9E9E9E"))), e -> {
                 pip.hide();
                 System.exit(0);
             }));

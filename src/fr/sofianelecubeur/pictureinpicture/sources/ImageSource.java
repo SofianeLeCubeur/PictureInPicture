@@ -1,5 +1,6 @@
 package fr.sofianelecubeur.pictureinpicture.sources;
 
+import fr.sofianelecubeur.pictureinpicture.ImageHelper;
 import fr.sofianelecubeur.pictureinpicture.PictureSource;
 
 import java.awt.*;
@@ -21,7 +22,8 @@ public class ImageSource implements PictureSource {
 
     @Override
     public void draw(Graphics g, Dimension currentSize) {
-        g.drawImage(image, 0, 0, null);
+        Dimension scale = ImageHelper.getScaledDimension(new Dimension(image.getWidth(null), image.getHeight(null)), currentSize);
+        g.drawImage(image.getScaledInstance(scale.width, scale.height, Image.SCALE_DEFAULT), 0, 0, null);
     }
 
     @Override

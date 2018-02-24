@@ -52,7 +52,7 @@ public class PictureToolbar extends JComponent {
             public void mouseReleased(MouseEvent e) {
                 int x = e.getX();
                 int index = x / (BUTTON_SIZE + PADDING);
-                if(index < actions.size() && actions.get(index) != null){
+                if(index >= 0 && index < actions.size() && actions.get(index) != null){
                     actions.get(index).actionPerformed(new ActionEvent(this, index, "click"));
                 }
             }
@@ -70,7 +70,7 @@ public class PictureToolbar extends JComponent {
                 return;
             }
             alpha += 0.15f;
-            if(alpha >= 1f)  alpha = 1;
+            if(alpha >= 1f) alpha = 1;
             repaint();
         });
         localTimer.start();
@@ -87,7 +87,7 @@ public class PictureToolbar extends JComponent {
                 return;
             }
             alpha -= 0.15f;
-            if(alpha <= 0f)  alpha = 0;
+            if(alpha <= 0f) alpha = 0;
             repaint();
         });
         localTimer.start();

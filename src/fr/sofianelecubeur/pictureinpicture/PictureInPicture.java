@@ -15,7 +15,7 @@ public class PictureInPicture {
 
     private JWindow frm;
     private ComponentResizer cr;
-    private PictureToolbar toolbar;
+    private PictureToolbar quickToolbar, controlToolbar;
     private PictureSource source;
 
     private Point pressed;
@@ -26,7 +26,8 @@ public class PictureInPicture {
     public PictureInPicture(PictureSource source) {
         this.source = source;
         this.cr = new ComponentResizer();
-        this.toolbar = new PictureToolbar();
+        this.quickToolbar = new PictureToolbar();
+        this.controlToolbar = new PictureToolbar();
     }
 
     public void show(){
@@ -43,9 +44,12 @@ public class PictureInPicture {
 
         JLayeredPane contentPane = new JLayeredPane();
 
-        toolbar.setForeground(Color.RED);
-        toolbar.setBounds(frm.getWidth() / 2 - toolbar.getWidth() / 2, frm.getHeight() / 2 - toolbar.getHeight() / 2, toolbar.getWidth(), toolbar.getHeight());
-        contentPane.add(toolbar, JLayeredPane.POPUP_LAYER);
+        quickToolbar.setBounds(frm.getWidth() / 2 - quickToolbar.getWidth() / 2, frm.getHeight() - quickToolbar.getHeight() - 3,
+                quickToolbar.getWidth(), quickToolbar.getHeight());
+        contentPane.add(quickToolbar, JLayeredPane.POPUP_LAYER);
+
+        controlToolbar.setBounds(frm.getWidth() - controlToolbar.getWidth() - 3, 0, controlToolbar.getWidth(), controlToolbar.getHeight());
+        contentPane.add(controlToolbar, JLayeredPane.POPUP_LAYER);
 
         sc = new JPanel(){
             @Override
@@ -62,7 +66,9 @@ public class PictureInPicture {
             @Override
             public void componentResized(ComponentEvent e) {
                 sc.setBounds(0, 0, frm.getWidth(), frm.getHeight());
-                toolbar.setBounds(frm.getWidth() / 2 - toolbar.getWidth() / 2, frm.getHeight() / 2 - toolbar.getHeight() / 2, toolbar.getWidth(), toolbar.getHeight());
+                quickToolbar.setBounds(frm.getWidth() / 2 - quickToolbar.getWidth() / 2, frm.getHeight() - quickToolbar.getHeight() - 3,
+                        quickToolbar.getWidth(), quickToolbar.getHeight());
+                controlToolbar.setBounds(frm.getWidth() - controlToolbar.getWidth() - 3, 0, controlToolbar.getWidth(), controlToolbar.getHeight());
             }
         });
 
@@ -74,15 +80,23 @@ public class PictureInPicture {
         }
         frm.addMouseListener(new MouseAdapter() {
 
+            boolean a;
+
             @Override
             public void mouseEntered(MouseEvent e) {
-                toolbar.fadeIn();
+                if(!a) {
+                    controlToolbar.fadeIn();
+                    quickToolbar.fadeIn();
+                    a = true;
+                }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if(e.getX() < 0 || e.getY() < 0 || e.getX() > frm.getWidth() || e.getY() > frm.getHeight()) {
-                    toolbar.fadeOut();
+                if(a && e.getX() < 0 || e.getY() < 0 || e.getX() > frm.getWidth() || e.getY() > frm.getHeight()) {
+                    controlToolbar.fadeOut();
+                    quickToolbar.fadeOut();
+                    a = false;
                 }
             }
 
@@ -117,8 +131,12 @@ public class PictureInPicture {
         }
     }
 
-    public PictureToolbar getToolbar() {
-        return toolbar;
+    public PictureToolbar getControlToolbar() {
+        return controlToolbar;
+    }
+
+    public PictureToolbar getQuickToolbar() {
+        return quickToolbar;
     }
 
     public void setDragRectangle(Rectangle dragRectangle) {
