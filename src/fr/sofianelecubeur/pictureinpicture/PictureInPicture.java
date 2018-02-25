@@ -1,5 +1,7 @@
 package fr.sofianelecubeur.pictureinpicture;
 
+import sun.swing.SwingUtilities2;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,7 +23,9 @@ public class PictureInPicture {
     private Point pressed;
     private JPanel sc;
     private Timer updater;
-    private Rectangle dragRectangle;
+    private Rectangle draggable;
+    private boolean dragging;
+    private Cursor moveCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR), old;
 
     public PictureInPicture(PictureSource source) {
         this.source = source;
@@ -35,12 +39,15 @@ public class PictureInPicture {
         frm.setName("PictureInPicture");
         frm.setAlwaysOnTop(true);
         frm.setFocusableWindowState(false);
+        frm.setType(Window.Type.POPUP);
         frm.setLocationRelativeTo(null);
 
         frm.setSize(source.getPrefferedSize());
-        Dimension scrSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Insets toolHeight = Toolkit.getDefaultToolkit().getScreenInsets(frm.getGraphicsConfiguration());
+        final Dimension scrSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final Insets toolHeight = Toolkit.getDefaultToolkit().getScreenInsets(frm.getGraphicsConfiguration());
         frm.setLocation(scrSize.width - 5 - frm.getWidth(), scrSize.height - toolHeight.bottom - 5 - frm.getHeight());
+
+        this.draggable = new Rectangle(10, 10, frm.getWidth() - 20, 20);
 
         JLayeredPane contentPane = new JLayeredPane();
 
@@ -48,7 +55,7 @@ public class PictureInPicture {
                 quickToolbar.getWidth(), quickToolbar.getHeight());
         contentPane.add(quickToolbar, JLayeredPane.POPUP_LAYER);
 
-        controlToolbar.setBounds(frm.getWidth() - controlToolbar.getWidth() - 3, 0, controlToolbar.getWidth(), controlToolbar.getHeight());
+        controlToolbar.setBounds(frm.getWidth() - controlToolbar.getWidth() - 6, 5, controlToolbar.getWidth(), controlToolbar.getHeight());
         contentPane.add(controlToolbar, JLayeredPane.POPUP_LAYER);
 
         sc = new JPanel(){
@@ -65,10 +72,13 @@ public class PictureInPicture {
         frm.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                sc.setBounds(0, 0, frm.getWidth(), frm.getHeight());
-                quickToolbar.setBounds(frm.getWidth() / 2 - quickToolbar.getWidth() / 2, frm.getHeight() - quickToolbar.getHeight() - 3,
-                        quickToolbar.getWidth(), quickToolbar.getHeight());
-                controlToolbar.setBounds(frm.getWidth() - controlToolbar.getWidth() - 3, 0, controlToolbar.getWidth(), controlToolbar.getHeight());
+                final int w = frm.getWidth(), h = frm.getHeight();
+                System.out.println(w + "/" + h);
+                sc.setBounds(0, 0, w, h);
+                quickToolbar.setBounds(w / 2 - quickToolbar.getWidth() / 2, h - quickToolbar.getHeight() - 3, quickToolbar.getWidth(), quickToolbar.getHeight());
+                System.out.println(controlToolbar.getHeight());
+                controlToolbar.setBounds(w - controlToolbar.getWidth() - 6, 5, controlToolbar.getWidth(), controlToolbar.getHeight());
+                draggable = new Rectangle(10, 10, w - 20, 20);
             }
         });
 
@@ -77,6 +87,8 @@ public class PictureInPicture {
         cr.setMinimumSize(MIN_SIZE);
         if(source.getMaxmimumSize() != null){
             cr.setMaximumSize(source.getMaxmimumSize());
+        } else {
+            cr.setMaximumSize(new Dimension(scrSize.width, scrSize.height - toolHeight.bottom));
         }
         frm.addMouseListener(new MouseAdapter() {
 
@@ -89,14 +101,22 @@ public class PictureInPicture {
                     quickToolbar.fadeIn();
                     a = true;
                 }
+                if(old != null){
+                    e.getComponent().setCursor(old);
+                    old = null;
+                }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if(a && e.getX() < 0 || e.getY() < 0 || e.getX() > frm.getWidth() || e.getY() > frm.getHeight()) {
+                if(a && !frm.getBounds().contains(e.getPoint())) {
                     controlToolbar.fadeOut();
                     quickToolbar.fadeOut();
                     a = false;
+                }
+                if(old != null){
+                    e.getComponent().setCursor(old);
+                    old = null;
                 }
             }
 
@@ -104,16 +124,50 @@ public class PictureInPicture {
             public void mousePressed(MouseEvent e) {
                 pressed = e.getPoint();
             }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                dragging = false;
+            }
         });
         frm.addMouseMotionListener(new MouseMotionAdapter() {
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if(draggable.contains(e.getPoint())){
+                    if(old == null){
+                        old = frm.getCursor();
+                    } else if(frm.getCursor() != moveCursor) {
+                        frm.setCursor(moveCursor);
+                    }
+                }
+            }
+
             @Override
             public void mouseDragged(MouseEvent e) {
-                if(dragRectangle != null && dragRectangle.contains(e.getPoint())) {
-                    Component component = e.getComponent();
+                final Component component = e.getComponent();
+                if((dragging || draggable.contains(e.getPoint())) && !cr.isResizing()) {
                     Point location = frm.getLocation();
                     int x = location.x - (int) pressed.getX() + e.getX();
                     int y = location.y - (int) pressed.getY() + e.getY();
+
+                    if(x <= 5){
+                        x = 2;
+                    }
+                    if(y <= 5){
+                        y = 2;
+                    }
+
+                    if(x >= (scrSize.width - frm.getWidth() - 5)){
+                        x = scrSize.width - frm.getWidth() - 2;
+                    }
+
+                    if(y >= (scrSize.height - frm.getHeight() - 5)){
+                        y = scrSize.height - frm.getHeight() - 2;
+                    }
+
                     component.setLocation(x, y);
+                    dragging = true;
                 }
             }
         });
@@ -128,6 +182,9 @@ public class PictureInPicture {
     public void hide(){
         if(frm != null){
             frm.setVisible(false);
+            if(updater != null){
+                updater.stop();
+            }
         }
     }
 
@@ -137,14 +194,6 @@ public class PictureInPicture {
 
     public PictureToolbar getQuickToolbar() {
         return quickToolbar;
-    }
-
-    public void setDragRectangle(Rectangle dragRectangle) {
-        this.dragRectangle = dragRectangle;
-    }
-
-    public Rectangle getDragRectangle() {
-        return dragRectangle;
     }
 
     public void setSource(PictureSource source) {
@@ -157,9 +206,13 @@ public class PictureInPicture {
             updater.start();
         }
         if(frm != null){
+            cr.deregisterComponent(frm);
             frm.setSize(source.getPrefferedSize());
             frm.revalidate();
             frm.repaint();
+        }
+        if(source.isResizable()){
+            cr.registerComponent(frm);
         }
         if(source.getMaxmimumSize() != null){
             cr.setMaximumSize(source.getMaxmimumSize());

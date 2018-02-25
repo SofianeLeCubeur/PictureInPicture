@@ -1,6 +1,5 @@
 package fr.sofianelecubeur.pictureinpicture.sources;
 
-import fr.sofianelecubeur.pictureinpicture.ImageHelper;
 import fr.sofianelecubeur.pictureinpicture.PictureSource;
 
 import java.awt.*;
@@ -16,14 +15,18 @@ public class ImageSource implements PictureSource {
     private Image image;
 
     public ImageSource(Dimension prefferedSize, Image image) {
-        this.prefferedSize = prefferedSize;
+        this.prefferedSize = (prefferedSize == null ? new Dimension(image.getWidth(null), image.getHeight(null)) : prefferedSize);
         this.image = image;
     }
 
     @Override
     public void draw(Graphics g, Dimension currentSize) {
-        Dimension scale = ImageHelper.getScaledDimension(new Dimension(image.getWidth(null), image.getHeight(null)), currentSize);
-        g.drawImage(image.getScaledInstance(scale.width, scale.height, Image.SCALE_DEFAULT), 0, 0, null);
+        g.drawImage(image, 0, 0, null);
+    }
+
+    @Override
+    public boolean isResizable() {
+        return false;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class ImageSource implements PictureSource {
     }
 
     public void setPrefferedSize(Dimension prefferedSize) {
-        this.prefferedSize = prefferedSize;
+        this.prefferedSize = (prefferedSize == null ? new Dimension(image.getWidth(null), image.getHeight(null)) : prefferedSize);
     }
 
     public Image getImage() {

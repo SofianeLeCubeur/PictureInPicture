@@ -1,12 +1,9 @@
 package fr.sofianelecubeur.pictureinpicture;
 
-import fr.sofianelecubeur.pictureinpicture.sources.ImageSource;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -20,9 +17,7 @@ public class Main {
     public static void main(String[] args){
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {}
         PictureSource source = new PictureSource() {
             @Override
             public void draw(Graphics g, Dimension currentSize) {
@@ -37,7 +32,12 @@ public class Main {
 
             @Override
             public int getUpdateRate() {
-                return 50;
+                return 0;
+            }
+
+            @Override
+            public boolean isResizable() {
+                return true;
             }
 
             @Override
@@ -68,8 +68,8 @@ public class Main {
             }));*/
             InputStream in = Main.class.getResourceAsStream("res/close.png");
             BufferedImage i = ImageIO.read(in);
-            pip.getControlToolbar().add(new ToolButton("exit", new ImageIcon(ImageHelper.replace(i, Color.decode("#F5F7FA"))),
-                    new ImageIcon(ImageHelper.replace(i, Color.decode("#9E9E9E"))), e -> {
+            pip.getControlToolbar().add(new ToolButton("close", new ImageIcon(ImageHelper.replace(i, Color.decode("#9E9E9E"))),
+                    new ImageIcon(ImageHelper.replace(i, Color.decode("#F5F7FA"))), e -> {
                 pip.hide();
                 System.exit(0);
             }));

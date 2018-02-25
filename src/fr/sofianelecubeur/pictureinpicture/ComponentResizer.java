@@ -458,4 +458,10 @@ public class ComponentResizer extends MouseAdapter
 			return source.getParent().getSize();
 		}
 	}
+
+	// Modified By SofianeLeCubeur
+	public boolean isResizing()
+	{
+		return resizing;
+	}
 }

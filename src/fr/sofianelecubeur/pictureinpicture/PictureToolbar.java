@@ -20,12 +20,15 @@ public class PictureToolbar extends JComponent {
     private float alpha = 0f;
     private int hoverIndex = -1;
 
+    private final Cursor hand = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR), old;
+
     public PictureToolbar() {
         this(new ArrayList<>());
     }
 
     public PictureToolbar(List<AbstractAction> actions) {
         this.actions = actions;
+        this.old = getCursor();
         setOpaque(false);
         setSize((BUTTON_SIZE + PADDING) * actions.size(), BUTTON_SIZE);
         addMouseMotionListener(new MouseMotionAdapter() {
@@ -33,9 +36,14 @@ public class PictureToolbar extends JComponent {
             public void mouseMoved(MouseEvent e) {
                 int x = e.getX();
                 int index = x / (BUTTON_SIZE + PADDING);
-                if(index < actions.size() && actions.get(index) != null){
+                if(index >= 0 && index < actions.size() && actions.get(index) != null){
                     hoverIndex = index;
+                    setCursor(hand);
                     repaint();
+                } else {
+                    if(getCursor() == hand){
+                        setCursor(old);
+                    }
                 }
             }
         });
@@ -121,11 +129,6 @@ public class PictureToolbar extends JComponent {
             }
             i++;
         }
-    }
-
-    public void add(AbstractAction action){
-        actions.add(action);
-        setSize((BUTTON_SIZE + PADDING) * actions.size(), BUTTON_SIZE + PADDING);
     }
 
     public void add(ToolButton action){
