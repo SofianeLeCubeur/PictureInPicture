@@ -1,5 +1,6 @@
 package fr.sofianelecubeur.pictureinpicture;
 
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -8,6 +9,8 @@ import java.awt.*;
  * @author Sofiane
  */
 public interface PictureSource {
+
+    void init(JComponent component);
 
     /**
      * This method is called when the source is rendered to the PiP (Picture in Picture).

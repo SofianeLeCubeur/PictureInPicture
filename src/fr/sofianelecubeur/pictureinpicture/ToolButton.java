@@ -25,6 +25,14 @@ public class ToolButton {
         this.action.putValue(HOVER_ICON, hoverIcon);
     }
 
+    public void setIcon(Icon icon){
+        this.action.putValue(AbstractAction.SMALL_ICON, icon);
+    }
+
+    public void setHoverIcon(Icon hoverIcon){
+        this.action.putValue(HOVER_ICON, hoverIcon);
+    }
+
     public AbstractAction toAbstractAction() {
         return action;
     }

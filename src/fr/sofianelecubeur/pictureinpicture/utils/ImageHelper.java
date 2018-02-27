@@ -1,4 +1,4 @@
-package fr.sofianelecubeur.pictureinpicture;
+package fr.sofianelecubeur.pictureinpicture.utils;
 
 import java.awt.*;
 import java.awt.image.*;
@@ -32,6 +32,12 @@ public class ImageHelper {
         }
 
         return new Dimension(new_width, new_height);
+    }
+
+    public static BufferedImage[] getImageArray(BufferedImage image, int width, int height, int totalImages) {
+        BufferedImage[] array = new BufferedImage[totalImages];
+        for (int i = 0; i < totalImages; i++) array[i] = image.getSubimage(i * width, 0, width, height);
+        return array;
     }
 
     public static BufferedImage replace(BufferedImage image, Color to){

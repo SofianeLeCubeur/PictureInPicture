@@ -2,6 +2,7 @@ package fr.sofianelecubeur.pictureinpicture.sources;
 
 import fr.sofianelecubeur.pictureinpicture.PictureSource;
 
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -17,6 +18,10 @@ public class ImageSource implements PictureSource {
     public ImageSource(Dimension prefferedSize, Image image) {
         this.prefferedSize = (prefferedSize == null ? new Dimension(image.getWidth(null), image.getHeight(null)) : prefferedSize);
         this.image = image;
+    }
+
+    @Override
+    public void init(JComponent component) {
     }
 
     @Override

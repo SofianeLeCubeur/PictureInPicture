@@ -1,4 +1,9 @@
-package fr.sofianelecubeur.pictureinpicture;
+package fr.sofianelecubeur.pictureinpicture.examples;
+
+import fr.sofianelecubeur.pictureinpicture.PictureInPicture;
+import fr.sofianelecubeur.pictureinpicture.PictureSource;
+import fr.sofianelecubeur.pictureinpicture.ToolButton;
+import fr.sofianelecubeur.pictureinpicture.utils.ImageHelper;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -12,13 +17,21 @@ import java.io.InputStream;
  *
  * @author Sofiane
  */
-public class Main {
+public class MainExample {
 
     public static void main(String[] args){
+        if(args.length >= 1 && args[0].equalsIgnoreCase("sp")){
+            SoundPlayerExample.main(args);
+            return;
+        }
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {}
         PictureSource source = new PictureSource() {
+            @Override
+            public void init(JComponent component) {
+            }
+
             @Override
             public void draw(Graphics g, Dimension currentSize) {
                 g.setColor(Color.BLACK);
@@ -48,7 +61,7 @@ public class Main {
         PictureInPicture pip = new PictureInPicture(source);
 
         try {
-            //InputStream in = Main.class.getResourceAsStream("res/upload.png");
+            //InputStream in = MainExample.class.getResourceAsStream("res/upload.png");
            // BufferedImage i = ImageIO.read(in);
             /*pip.getToolbar().add(new ToolButton("upload", new ImageIcon(ImageHelper.replace(i, Color.decode("#F5F7FA"))),
                     new ImageIcon(ImageHelper.replace(i, Color.decode("#9E9E9E"))), e -> {
@@ -66,7 +79,7 @@ public class Main {
                     }
                 }
             }));*/
-            InputStream in = Main.class.getResourceAsStream("res/close.png");
+            InputStream in = PictureInPicture.class.getResourceAsStream("res/close.png");
             BufferedImage i = ImageIO.read(in);
             pip.getControlToolbar().add(new ToolButton("close", new ImageIcon(ImageHelper.replace(i, Color.decode("#9E9E9E"))),
                     new ImageIcon(ImageHelper.replace(i, Color.decode("#F5F7FA"))), e -> {

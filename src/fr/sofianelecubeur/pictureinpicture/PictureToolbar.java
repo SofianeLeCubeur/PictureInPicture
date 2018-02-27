@@ -17,6 +17,7 @@ public class PictureToolbar extends JComponent {
 
     private List<AbstractAction> actions;
     private Timer localTimer;
+    private boolean animated = true;
     private float alpha = 0f;
     private int hoverIndex = -1;
 
@@ -67,8 +68,16 @@ public class PictureToolbar extends JComponent {
         });
     }
 
+    public void setAnimated(boolean animated) {
+        this.animated = animated;
+    }
+
+    public boolean isAnimated() {
+        return animated;
+    }
+
     protected void fadeIn(){
-        if(alpha >= 1f) return;
+        if(!animated || alpha >= 1f) return;
         if(localTimer != null){
             localTimer.stop();
         }
@@ -85,7 +94,7 @@ public class PictureToolbar extends JComponent {
     }
 
     protected void fadeOut(){
-        if(alpha <= 0f) return;
+        if(!animated || alpha <= 0f) return;
         if(localTimer != null){
             localTimer.stop();
         }
@@ -107,7 +116,9 @@ public class PictureToolbar extends JComponent {
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setStroke(new BasicStroke(1f));
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        if(animated) {
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        }
 
         g2.setColor(getForeground());
         int i = 0;

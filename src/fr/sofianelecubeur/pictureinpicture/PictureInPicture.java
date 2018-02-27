@@ -61,10 +61,12 @@ public class PictureInPicture {
         sc = new JPanel(){
             @Override
             protected void paintComponent(Graphics g) {
+                g.setFont(sc.getFont());
                 source.draw(g, frm.getSize());
             }
         };
         sc.setBounds(0, 0, frm.getWidth(), frm.getHeight());
+        source.init(sc);
         contentPane.add(sc);
 
         frm.setContentPane(contentPane);
@@ -73,16 +75,16 @@ public class PictureInPicture {
             @Override
             public void componentResized(ComponentEvent e) {
                 final int w = frm.getWidth(), h = frm.getHeight();
-                System.out.println(w + "/" + h);
                 sc.setBounds(0, 0, w, h);
                 quickToolbar.setBounds(w / 2 - quickToolbar.getWidth() / 2, h - quickToolbar.getHeight() - 3, quickToolbar.getWidth(), quickToolbar.getHeight());
-                System.out.println(controlToolbar.getHeight());
                 controlToolbar.setBounds(w - controlToolbar.getWidth() - 6, 5, controlToolbar.getWidth(), controlToolbar.getHeight());
                 draggable = new Rectangle(10, 10, w - 20, 20);
             }
         });
 
-        cr.registerComponent(frm);
+        if(source.isResizable()){
+            cr.registerComponent(frm);
+        }
         cr.setSnapSize(new Dimension(10, 10));
         cr.setMinimumSize(MIN_SIZE);
         if(source.getMaxmimumSize() != null){
@@ -162,8 +164,8 @@ public class PictureInPicture {
                         x = scrSize.width - frm.getWidth() - 2;
                     }
 
-                    if(y >= (scrSize.height - frm.getHeight() - 5)){
-                        y = scrSize.height - frm.getHeight() - 2;
+                    if(y >= (scrSize.height - toolHeight.bottom - frm.getHeight() - 5)){
+                        y = scrSize.height - toolHeight.bottom - frm.getHeight() - 2;
                     }
 
                     component.setLocation(x, y);
